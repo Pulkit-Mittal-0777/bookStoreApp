@@ -1,5 +1,7 @@
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 import { Link } from 'react-router-dom'
+import axios from 'axios'
+import { AuthDataContext } from '../context/AuthContext'
 const Login = () => {
 
     const [formData, setFormData] = useState({
@@ -14,11 +16,23 @@ const Login = () => {
             [e.target.name]:e.target.value
         })
     }
-    const submitHandler = (e) => {
+    const[authUser,setAuthUser]=useContext(AuthDataContext)
+    const submitHandler = async (e) => {
 
+        const {email,password}=formData
+        await axios.post('http://localhost:4001/user/login',{email,password})
+            .then((res)=>{
+                console.log(res.data)
+                localStorage.setItem("user",JSON.stringify(res.data.user))
+                setAuthUser(res.data.user)
+                alert("user loggedin successfully")
+            })
+            .catch((err)=>{
+                alert(err.response.data.message)
+            })
         e.preventDefault();
-        console.log(formData.email)
-        console.log(formData.password)
+        
+        
 
         setFormData({
             email: "",
@@ -36,7 +50,7 @@ const Login = () => {
                         onSubmit={submitHandler}
                     >
                         {/* if there is a button in form, it will close the modal */}
-                        <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
+                        <button type='button' className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
                             onClick={() => document.getElementById("my_modal_3").close()}
                         >
                             ✕</button>
