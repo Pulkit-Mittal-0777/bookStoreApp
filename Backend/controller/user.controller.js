@@ -57,8 +57,18 @@ export const login = async (req, res) => {
                 email: user.email,
             }
         }
-        const SECRET_KEY=process.env.JWT_SECRET_KEY
-        const authToken=jwt.sign(data,SECRET_KEY);
+        const SECRET_KEY = process.env.JWT_SECRET_KEY
+        const token = jwt.sign(
+            { id: user._id },
+            SECRET_KEY,
+            { expiresIn: "7d" }
+        );
+
+        res.cookie("token", token, {
+            httpOnly: true,
+            sameSite: "lax",
+            maxAge: 7 * 24 * 60 * 60 * 1000
+        })
         res.status(200).json(
             {
                 message: "user loggedin successfully",
@@ -67,12 +77,46 @@ export const login = async (req, res) => {
                     username: user.username,
                     email: user.email,
                 },
-                authToken:authToken
+                token: token
             }
         )
 
     }
     catch (error) {
         res.status(500).json({ message: "Internal server error" });
+    }
+}
+
+export const me=async (req,res)=>{
+    
+    try{
+        
+        const user=await User.findById(req.userId).select("-password");
+        res.json(user)
+    }   
+    catch(error){
+        res.status(500).json({message:"internal server error"})
+    } 
+}
+
+export const logout = (req, res) => {
+    // console.log("heyyyyy!!!")
+    try {
+
+        res.clearCookie("token", {
+            httpOnly: true,
+            sameSite: "lax",
+
+        });
+
+        return res.status(200).json({
+            success: true,
+            message: "Logged out successfully"
+        });
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: "Logout failed"
+        });
     }
 }

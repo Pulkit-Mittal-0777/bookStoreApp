@@ -10,12 +10,15 @@ function Course() {
 
     const getBook = async () => {
       try {
-        const res=await axios.get('http://localhost:4001/book')
+        const res=await axios.get('http://localhost:4001/book',{
+          withCredentials:true
+        })
         console.log(res)
         setBook(res.data)
       }
       catch(error) {
-        console.log(error)
+        console.log(error.response.data)
+        return
       }
     }
     

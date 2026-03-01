@@ -1,13 +1,23 @@
 import React, { useContext } from 'react'
 import { AuthDataContext } from '../context/AuthContext'
-
+import axios from 'axios';
 const Logout = () => {
-    const [authUser,setAuthUser]=useContext(AuthDataContext);
-    const handleLogout=()=>{
-        
-        setAuthUser(null)
-        localStorage.removeItem("user");
-        alert("Logged out successfully")
+    const [authUser, setAuthUser] = useContext(AuthDataContext);
+    const handleLogout = async() => {
+
+        try {
+            await axios.post(
+                "http://localhost:4001/user/logout",
+                {},
+                { withCredentials: true } // VERY IMPORTANT
+            );
+
+            setAuthUser(null); // clear frontend state
+            alert("Logged out successfully");
+
+        } catch (error) {
+            console.log(error);
+        }
     }
     return (
         <div>

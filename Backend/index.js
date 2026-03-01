@@ -5,6 +5,7 @@ import Book from './model/book.model.js';
 import bookRoute from './route/book.route.js'
 import userRoute from './route/user.route.js'
 import cors from 'cors'
+import cookieParser from "cookie-parser";
 const app=express();
 dotenv.config()
 
@@ -19,7 +20,11 @@ mongoose.connect(URI)
 
 
 app.use(express.json())
-app.use(cors())
+app.use(cookieParser()); 
+app.use(cors({
+  origin: "http://localhost:5173", // frontend URL (must be exact)
+  credentials: true                // allow cookies
+}));
 
 app.get('/',(req,res)=>{
 
